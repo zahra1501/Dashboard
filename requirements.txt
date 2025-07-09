@@ -1,11 +1,10 @@
 streamlit
-scikit-learn
-joblib
 pandas
 numpy
+scikit-learn
+joblib
 matplotlib
 plotly
 seaborn
 geopandas
-lime
-pickle
+pyarrow
