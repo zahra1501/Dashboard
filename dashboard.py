@@ -19,7 +19,6 @@ import pickle
 import os
 #import scikitplot as skplt
 
-from lime import lime_tabular
 os.environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 
 ## Load Data
