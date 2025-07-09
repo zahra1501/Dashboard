@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 import seaborn as sns
 import geopandas as gpd
 import json
-import os
+import pickle
 #import scikitplot as skplt
 
 from lime import lime_tabular
@@ -79,13 +79,13 @@ with tab2:
         st.pyplot(heatmap_fig, use_container_width=True)  
     
     with col2:
-        # Hitung permutation importance
-        result = permutation_importance(rf_model, X_test, y_test, n_repeats=30, random_state=42)
-        importances = result.importances_mean
+        # Load permutation importance dari file
+        with open("perm_importance.pkl", "rb") as f:
+            result, feature_names = pickle.load(f)
 
-        # Urutkan berdasarkan importance
+        importances = result.importances_mean
         sorted_idx = np.argsort(importances)[::-1]
-        sorted_features = np.array(data_x.columns)[sorted_idx]
+        sorted_features = np.array(feature_names)[sorted_idx]
         sorted_importances = importances[sorted_idx]
 
         # Visualisasi vertikal
