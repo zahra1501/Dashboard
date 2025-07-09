@@ -22,8 +22,8 @@ from lime import lime_tabular
 os.environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 
 ## Load Data
-df = pd.read_csv('/Users/fathimahaz-zahra/Documents/Dashboard/data_irigasi_revisi_lagi2.csv')
-geo_df = pd.read_csv('/Users/fathimahaz-zahra/Documents/Dashboard/data_tahunan_baru.csv')
+df = pd.read_csv('data_irigasi_revisi_lagi2.csv')
+geo_df = pd.read_csv('data_tahunan_baru.csv')
 
 # Standarisasi
 dset = df[['presipitasi','sm_smap','tmin','tmax','t','swr','et_era5']]
