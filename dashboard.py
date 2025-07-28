@@ -43,8 +43,8 @@ rf_model = load("model_rf.model")
 y_pred = rf_model.predict(X_test)
 
 ## Dashboard
-st.title("Estimasi Penggunaan Air Irigasi di Indonesia")
-st.markdown("Estimasi Air Irigasi Menggunakan Model Random Forest Berdasarkan Karakteristik Hidrologi dan Iklim")
+st.title("Estimasi Volume Air Irigasi di Indonesia")
+st.markdown("Estimasi Volume Air Irigasi Menggunakan Model Random Forest Berdasarkan Karakteristik Hidrologi dan Iklim")
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs(("Gambaran Umum", "Performa Model", "Hasil Penelitian", "Estimasi dengan Model", "Data"))
 
