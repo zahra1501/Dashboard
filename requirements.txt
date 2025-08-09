@@ -9,3 +9,4 @@ lightgbm
 catboost
 graphviz
 pydot
+streamlit-mermaid
