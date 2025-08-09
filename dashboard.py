@@ -1,5 +1,7 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
+from streamlit_mermaid import st_mermaid
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
@@ -8,6 +10,7 @@ from joblib import load
 from sklearn.inspection import permutation_importance
 
 import pandas as pd
+import graphviz
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -64,8 +67,9 @@ df, geo_df = load_data()
 rf_model, mean, std = load_model_and_scaler()
 
 # --- Tabs untuk navigasi ---
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab_overview, tab_method, tab_performance, tab_map, tab_estimation, tab_data = st.tabs([
     "Gambaran Umum", 
+    "Langkah-langkah Pemodelan",
     "Performa Model", 
     "Peta Interaktif", 
     "Estimasi dengan Model", 
@@ -73,7 +77,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 ])
 
 # --- Konten Tab 1: Gambaran Umum ---
-with tab1:
+with tab_overview:
     st.header("🌾 Gambaran Umum Penelitian")
 
     st.markdown("""
@@ -137,8 +141,225 @@ with tab1:
     """, unsafe_allow_html=True)
 
 
+# --- Konten: Metode Penelitian ---
+with tab_method:
+ # ===== CSS CUSTOM =====
+    st.markdown("""
+    <style>
+        .info-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        margin-bottom: 15px;
+        }
+        .info-card h5 {
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+        .stButton > button {
+            width: 100%;
+            border-radius: 8px;
+            padding: 8px;
+            font-weight: 600;
+        }
+        .model-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .model-buttons > div {
+            flex: 1;
+        }
+        .stButton > button:hover {
+        background-color: #03396c;
+        color: white;
+        border-color: white;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown("""
+        <h2>📌 Metodologi Penelitian & Pemodelan</h2>
+        <p style='font-size:15px; color:#5D6D7E;'>
+            Diagram alur berikut menjelaskan tahapan penelitian mulai dari pengumpulan data hingga visualisasi hasil estimasi volume air irigasi.
+        </p>
+        <hr style='border: 1px solid #ddd; margin-bottom:20px;'>
+        """, unsafe_allow_html=True)
+
+        graph = """
+        digraph {
+            rankdir=LR
+            node [shape=box style="rounded,filled" fontname="Helvetica" fontsize=12 penwidth=1.5]
+            A [label="Mulai", shape=ellipse, fillcolor="#ABEBC6", style="filled,bold"]
+            B [label="Pengumpulan Data", fillcolor="#AED6F1"]
+            C [label="Preprocessing Data", fillcolor="#AED6F1"]
+            D [label="Estimasi Volume Air Irigasi\\n2021-2022 (SM2RAIN)", fillcolor="#F9E79F"]
+            E [label="Analisis Deskriptif", fillcolor="#FAD7A0"]
+            F [label="Pemodelan ML & DL", fillcolor="#F5B7B1"]
+            G [label="Evaluasi Model", fillcolor="#F5B7B1"]
+            H [label="Estimasi Volume Air Irigasi\\n2023-2024 (Model Terbaik)", fillcolor="#F9E79F"]
+            I [label="Agregasi Bulanan → Tahunan\\nper Provinsi", fillcolor="#FAD7A0"]
+            J [label="Visualisasi", fillcolor="#AED6F1"]
+            K [label="Selesai", shape=ellipse, fillcolor="#ABEBC6", style="filled,bold"]
+            edge [color="#5D6D7E", penwidth=2, arrowsize=0.8]
+            A -> B -> C -> D -> E -> F -> G -> H -> I -> J -> K
+        }
+        """
+        st.graphviz_chart(graph, use_container_width=True)
+
+        st.markdown("---")
+
+        st.markdown("**📋 Pilih Model untuk Melihat Langkah-Langkah:**")
+
+        if "main_menu" not in st.session_state:
+            st.session_state.main_menu = None
+        if "sub_menu" not in st.session_state:
+            st.session_state.sub_menu = None
+
+        col1, col2, col3, col4 = st.columns(4)
+        # ==== LEVEL 1 Button ====
+        with col1:
+            if st.button("🌧 SM2RAIN", use_container_width=True):
+                st.session_state.main_menu = "sm2rain"
+                st.session_state.sub_menu = None
+        with col2:
+            if st.button("🤖 Machine Learning"):
+                st.session_state.main_menu = "ml"
+                st.session_state.sub_menu = None
+        with col3:
+            if st.button("🧠 Deep Learning"):
+                st.session_state.main_menu = "dl"
+                st.session_state.sub_menu = None
+        with col4:
+            if st.button("❌ Tutup Penjelasan"):
+                st.session_state.main_menu = False
+                st.session_state.sub_menu = False
+
+        # Tambahkan tombol tutup
+        # if st.session_state.main_menu or st.session_state.sub_menu:
+        #     st.markdown("---")
+        #     if st.button("❌ Tutup Penjelasan"):
+        #         st.session_state.main_menu = None
+        #         st.session_state.sub_menu = None
+        #         st.rerun()
+
+
+        # ===== LEVEL 2 Button =====
+        if st.session_state.main_menu == "ml":
+            st.markdown("### Pilih Model Machine Learning")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                if st.button("🌳 Random Forest"):
+                    st.session_state.sub_menu = "rf"
+            with c2:
+                if st.button("⚡ XGBoost"):
+                    st.session_state.sub_menu = "xgb"
+            with c3:
+                if st.button("📈 SVR"):
+                    st.session_state.sub_menu = "svr"
+
+        elif st.session_state.main_menu == "dl":
+            st.markdown("### Pilih Model Deep Learning")
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("🔢 MLP"):
+                    st.session_state.sub_menu = "mlp"
+            with c2:
+                if st.button("🖼 CNN"):
+                    st.session_state.sub_menu = "cnn"
+
+        # ==== KONTEN ====
+        if st.session_state.main_menu == "sm2rain":
+            st.markdown("""
+            ### 📊 Penjelasan Metode SM2RAIN
+            Metode **SM2RAIN** merupakan teknik inovatif untuk mengestimasi curah hujan dan volume air irigasi. Metode ini bekerja dengan mengubah data kelembaban tanah satelit menjadi data presipitasi (curah hujan). Dengan demikian, kita dapat memperkirakan seberapa banyak air yang masuk ke dalam tanah, yang merupakan dasar dari ketersediaan air irigasi.
+
+            ---
+
+            ### 📝 Langkah-Langkah Perhitungan dan Kalibrasi
+            Perhitungan volume air irigasi bulanan menggunakan SM2RAIN diawali dengan proses **kalibrasi parameter** kunci: $Z^*, K_s, \lambda,$ dan $K_c$. Kalibrasi ini sangat penting karena memastikan model dapat menyesuaikan diri dengan karakteristik unik setiap daerah irigasi.
+
+            1. **Fokus Kalibrasi**: Proses kalibrasi hanya dilakukan pada **hari-hari hujan** (presipitasi > 0) dengan asumsi bahwa tidak ada aktivitas irigasi pada hari tersebut.
+            2. **Basis Kalibrasi**: Mengacu pada Brocca et al. (2018), kalibrasi mempertimbangkan **presipitasi bulanan**.
+            3. **Langkah Perhitungan**:
+            """, unsafe_allow_html=True)
+
+            st.latex(r"""
+            r(t) = Z^{*} \frac{dS(t)}{dt} + K_s S(t)^{\left(3 + \frac{2}{\lambda}\right)} + ET_{\text{pot}}(t) S(t)
+            """)
+
+            st.markdown("""
+            * **Agregasi Bulanan**: Jumlahkan presipitasi harian menjadi nilai presipitasi bulanan.
+            * **Evaluasi Model**: Bandingkan hasil presipitasi bulanan dari SM2RAIN dengan data CHIRPS.
+            * **Penyesuaian Parameter**: Sesuaikan parameter model menggunakan **Root Mean Square Distance**.
+
+            4. **Kalibrasi Per Daerah**: Dilakukan untuk setiap daerah irigasi secara terpisah.
+
+            ---
+
+            ### 💧 Perhitungan Volume Air Irigasi
+            Setelah parameter dikalibrasi, nilai tersebut digunakan untuk menghitung total air yang masuk ke tanah (irigasi + presipitasi).
+
+            1. **Perhitungan Total Air Harian**:
+            """, unsafe_allow_html=True)
+
+            st.latex(r"""
+            i(t) + r(t) = Z^{*} \frac{dS(t)}{dt} + K_s S(t)^{\left(3 + \frac{2}{\lambda}\right)} + ET_{\text{pot}}(t) S(t)
+            """)
+
+            st.markdown("""
+            2. **Agregasi Bulanan**: Jumlahkan nilai harian per bulan.
+            3. **Perhitungan Volume Air Irigasi**: Kurangi total air bulanan dengan presipitasi CHIRPS.
+            4. **Validasi**: Jika rasio < 1.5, nilai di-mask.
+
+            Dengan tahapan ini, kita dapat memisahkan volume air irigasi dari curah hujan alami.
+            """, unsafe_allow_html=True)
+
+
+        if st.session_state.sub_menu == "rf":
+            st.subheader("🌳 Arsitektur Random Forest")
+            model_rf = pd.DataFrame({
+                "Hyperparameter": ["Kedalaman Maksimum", "Jumlah Fitur Maksimum", "Minimum Sample Leaf", "Minimum Sample Split", "Jumlah Pohon"],
+                "Nilai": [110, 4, 3, 8, 100]
+            })
+            st.table(model_rf)
+
+        elif st.session_state.sub_menu == "xgb":
+            st.subheader("⚡ Arsitektur XGBoost")
+            model_xgb = pd.DataFrame({
+                "Hyperparameter": ["Jumlah Estimator", "Kedalaman Maksimum", "Learning Rate", "Gamma", "Regulasi Lambda", "Bobot Kelas Positif"],
+                "Nilai": [100, 5, f"{0.1:.2f}", 0, 10, 1]
+            })
+            st.table(model_xgb)
+
+        elif st.session_state.sub_menu == "svr":
+            st.subheader("📈 Arsitektur SVR")
+            model_svr = pd.DataFrame({
+                "Hyperparameter": ["Kernel", "C", "epsilon"],
+                "Nilai": ["RBF", 20, 0.27]
+            })
+            st.table(model_svr)
+
+        elif st.session_state.sub_menu == "mlp":
+            st.subheader("🔢 Arsitektur MLP")
+            model_mlp = pd.DataFrame({
+                "Hyperparameter": ["Ukuran Hidden Layer", "Fungsi Aktivasi", "Solver", "Alpha", "Learning Rate"],
+                "Nilai": ["(64,32)", "reLU", "adam", 0.1, "adaptive"]
+            })
+            st.table(model_mlp)
+
+        elif st.session_state.sub_menu == "cnn":
+            st.subheader("🖼 Arsitektur CNN")
+            model_cnn = pd.DataFrame({
+                "Layer": ["Convolutional", "Max-pooling", "Convolutional", "Flatten", "Fully-Connected", "Dropout", "Output"],
+                "Hyperparameter": ["Filter = 32; Kernel Size = 3; Activation = reLU", "Pool size = 2", "Filter = 16, Kernel size = 2; Activation = reLU", "-", "16, Activation = reLU", 0.3, 1]
+            })
+            st.table(model_cnn)
+    
+
 # --- Konten Tab 2: Performa Model ---
-with tab2:
+with tab_performance:
     st.header("Model Terbaik: Random Forest")
 
     # Data model
@@ -263,11 +484,11 @@ with tab2:
             adalah presipitasi dan kelembapan tanah, karena keduanya berperan langsung 
             dalam ketersediaan dan penyerapan air oleh tanah. Sementara itu, variabel lain seperti suhu, shortwave radiation, 
             dan evapotranspirasi memiliki pengaruh lebih kecil, kemungkinan karena efeknya bersifat tidak langsung 
-            atau sudah tercakup oleh pengaruh presipitasi dan kelembapan tanah.
+            atau sudah tercakup oleh pengaruh presipitasi dan kelembaban tanah.
             """)
 
 # --- Konten Tab 3: Peta Interaktif ---
-with tab3:
+with tab_map:
     st.header("Peta Interaktif Volume Air Irigasi Tahunan")
 
     @st.cache_data
@@ -322,7 +543,7 @@ with tab3:
     st.plotly_chart(fig, use_container_width=True)
 
 # --- Konten Tab 4: Estimasi dengan Model ---
-with tab4:
+with tab_estimation:
     st.header("Estimasi Volume Air Irigasi")
     st.markdown("""
         Sesuaikan nilai variabel iklim dan hidrologi pada slider di sebelah kiri.
@@ -386,6 +607,6 @@ with tab4:
 
 
 # --- Konten Tab 5: Tampilan Data ---
-with tab5:
+with tab_data:
     st.header("Data Volume Air Irigasi 2021-2024")
     st.dataframe(df, use_container_width=True)
