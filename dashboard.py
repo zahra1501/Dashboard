@@ -158,7 +158,7 @@ with tab_method:
             margin-bottom: 10px;
         }
         .stButton > button {
-            width: 100%;
+            width: 100% !important;
             border-radius: 8px;
             padding: 8px;
             font-weight: 600;
