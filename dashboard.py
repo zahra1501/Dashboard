@@ -48,7 +48,7 @@ def load_data():
     geo_df = pd.read_csv('data_tahunan_baru.csv')
     return df, geo_df
 
-@st.cache_data
+@st.cache_resource
 def load_model_and_scaler():
     """Memuat model dan scaler dari file."""
     # Standarisasi data
@@ -217,57 +217,42 @@ with tab_method:
         if "sub_menu" not in st.session_state:
             st.session_state.sub_menu = None
 
+        def set_main_menu(menu_name):
+            st.session_state.main_menu = menu_name
+            st.session_state.sub_menu = None
+
+        def set_sub_menu(sub_name):
+            st.session_state.sub_menu = sub_name
+
         col1, col2, col3, col4 = st.columns([1,1,1,1]) 
         # ==== LEVEL 1 Button ====
         with col1:
-            if st.button("🌧 SM2RAIN", use_container_width=True):
-                st.session_state.main_menu = "sm2rain"
-                st.session_state.sub_menu = None
+            st.button("🌧 SM2RAIN", on_click=set_main_menu, args=("sm2rain",), use_container_width=True)
         with col2:
-            if st.button("🤖 Machine Learning", use_container_width=True):
-                st.session_state.main_menu = "ml"
-                st.session_state.sub_menu = None
+            st.button("🤖 Machine Learning", on_click=set_main_menu, args=("ml",), use_container_width=True)
         with col3:
-            if st.button("🧠 Deep Learning", use_container_width=True):
-                st.session_state.main_menu = "dl"
-                st.session_state.sub_menu = None
+            st.button("🧠 Deep Learning", on_click=set_main_menu, args=("dl",), use_container_width=True)
         with col4:
-            if st.button("❌ Tutup Penjelasan", use_container_width=True):
-                st.session_state.main_menu = False
-                st.session_state.sub_menu = False
-
-        # Tambahkan tombol tutup
-        # if st.session_state.main_menu or st.session_state.sub_menu:
-        #     st.markdown("---")
-        #     if st.button("❌ Tutup Penjelasan", use_container_width=True):
-        #         st.session_state.main_menu = None
-        #         st.session_state.sub_menu = None
-        #         st.rerun()
-
+            st.button("❌ Tutup Penjelasan", on_click=set_main_menu, args=(False,), use_container_width=True)
 
         # ===== LEVEL 2 Button =====
         if st.session_state.main_menu == "ml":
             st.markdown("### Pilih Model Machine Learning")
             c1, c2, c3 = st.columns(3)
             with c1:
-                if st.button("🌳 Random Forest", use_container_width=True):
-                    st.session_state.sub_menu = "rf"
+                st.button("🌳 Random Forest", on_click=set_sub_menu, args=("rf",), use_container_width=True)
             with c2:
-                if st.button("⚡ XGBoost", use_container_width=True):
-                    st.session_state.sub_menu = "xgb"
+                st.button("⚡ XGBoost", on_click=set_sub_menu, args=("xgb",), use_container_width=True)
             with c3:
-                if st.button("📈 SVR", use_container_width=True):
-                    st.session_state.sub_menu = "svr"
+                st.button("📈 SVR", on_click=set_sub_menu, args=("svr",), use_container_width=True)
 
         elif st.session_state.main_menu == "dl":
             st.markdown("### Pilih Model Deep Learning")
             c1, c2 = st.columns(2)
             with c1:
-                if st.button("🔢 MLP", use_container_width=True):
-                    st.session_state.sub_menu = "mlp"
+                st.button("🔢 MLP", on_click=set_sub_menu, args=("mlp",), use_container_width=True)
             with c2:
-                if st.button("🖼 CNN", use_container_width=True):
-                    st.session_state.sub_menu = "cnn"
+                st.button("🖼 CNN", on_click=set_sub_menu, args=("cnn",), use_container_width=True)
 
         # ==== KONTEN ====
         if st.session_state.main_menu == "sm2rain":
