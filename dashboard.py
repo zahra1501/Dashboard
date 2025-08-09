@@ -224,22 +224,22 @@ with tab_method:
                 st.session_state.main_menu = "sm2rain"
                 st.session_state.sub_menu = None
         with col2:
-            if st.button("🤖 Machine Learning"):
+            if st.button("🤖 Machine Learning", use_container_width=True):
                 st.session_state.main_menu = "ml"
                 st.session_state.sub_menu = None
         with col3:
-            if st.button("🧠 Deep Learning"):
+            if st.button("🧠 Deep Learning", use_container_width=True):
                 st.session_state.main_menu = "dl"
                 st.session_state.sub_menu = None
         with col4:
-            if st.button("❌ Tutup Penjelasan"):
+            if st.button("❌ Tutup Penjelasan", use_container_width=True):
                 st.session_state.main_menu = False
                 st.session_state.sub_menu = False
 
         # Tambahkan tombol tutup
         # if st.session_state.main_menu or st.session_state.sub_menu:
         #     st.markdown("---")
-        #     if st.button("❌ Tutup Penjelasan"):
+        #     if st.button("❌ Tutup Penjelasan", use_container_width=True):
         #         st.session_state.main_menu = None
         #         st.session_state.sub_menu = None
         #         st.rerun()
@@ -250,23 +250,23 @@ with tab_method:
             st.markdown("### Pilih Model Machine Learning")
             c1, c2, c3 = st.columns(3)
             with c1:
-                if st.button("🌳 Random Forest"):
+                if st.button("🌳 Random Forest", use_container_width=True):
                     st.session_state.sub_menu = "rf"
             with c2:
-                if st.button("⚡ XGBoost"):
+                if st.button("⚡ XGBoost", use_container_width=True):
                     st.session_state.sub_menu = "xgb"
             with c3:
-                if st.button("📈 SVR"):
+                if st.button("📈 SVR", use_container_width=True):
                     st.session_state.sub_menu = "svr"
 
         elif st.session_state.main_menu == "dl":
             st.markdown("### Pilih Model Deep Learning")
             c1, c2 = st.columns(2)
             with c1:
-                if st.button("🔢 MLP"):
+                if st.button("🔢 MLP", use_container_width=True):
                     st.session_state.sub_menu = "mlp"
             with c2:
-                if st.button("🖼 CNN"):
+                if st.button("🖼 CNN", use_container_width=True):
                     st.session_state.sub_menu = "cnn"
 
         # ==== KONTEN ====
