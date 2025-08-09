@@ -217,7 +217,7 @@ with tab_method:
         if "sub_menu" not in st.session_state:
             st.session_state.sub_menu = None
 
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3, col4 = st.columns([1,1,1,1]) 
         # ==== LEVEL 1 Button ====
         with col1:
             if st.button("🌧 SM2RAIN", use_container_width=True):
