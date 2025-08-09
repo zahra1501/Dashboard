@@ -27,8 +27,7 @@ os.environ["OGR_GEOJSON_MAX_OBJ_SIZE"] = "0"
 st.set_page_config(
     page_title="Dashboard Estimasi Air Irigasi",
     page_icon="💧",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 # --- Judul dan Deskripsi Utama Dashboard ---
@@ -326,66 +325,64 @@ with tab3:
 with tab4:
     st.header("Estimasi Volume Air Irigasi")
     st.markdown("""
-        Gunakan slider pada sidebar untuk menyesuaikan nilai variabel iklim dan hidrologi.
-        Hasil estimasi akan ditampilkan di bawah.
+        Sesuaikan nilai variabel iklim dan hidrologi pada slider di sebelah kiri.
+        Hasil estimasi akan langsung tampil di sebelah kanan.
     """)
-    st.markdown("<br>", unsafe_allow_html=True)
 
-    # --- Sidebar untuk input slider dan prediksi ---
-    st.sidebar.header("⚙️ Sesuaikan Parameter Estimasi")
-    
-    sliders = []
-    fitur_model = ['presipitasi', 'sm_smap', 'tmin', 'tmax', 'swr', 'et_era5']
+    col_slider, col_result = st.columns([1.2, 1])  # Kolom kiri untuk slider, kanan untuk hasil
 
-    label_mapping = {
-        'presipitasi': 'Presipitasi (mm/bulan)',
-        'sm_smap': 'Kelembaban Tanah (m³/m³)',
-        'tmin': 'Suhu Minimum (°C)',
-        'tmax': 'Suhu Maksimum (°C)',
-        'swr': 'Shortwave Radiation (J/m²)',
-        'et_era5': 'Evapotranspirasi (mm/bulan)'
-    }
-    for var in fitur_model:
-        var_slider = st.sidebar.slider(
-            label=label_mapping[var],
-            min_value=float(df[var].min()),
-            max_value=float(df[var].max()),
-            value=float(df[var].mean())
+    with col_slider:
+        sliders = []
+        fitur_model = ['presipitasi', 'sm_smap', 'tmin', 'tmax', 'swr', 'et_era5']
+
+        label_mapping = {
+            'presipitasi': 'Presipitasi (mm/bulan)',
+            'sm_smap': 'Kelembaban Tanah (m³/m³)',
+            'tmin': 'Suhu Minimum (°C)',
+            'tmax': 'Suhu Maksimum (°C)',
+            'swr': 'Shortwave Radiation (J/m²)',
+            'et_era5': 'Evapotranspirasi (mm/bulan)'
+        }
+
+        for var in fitur_model:
+            var_slider = st.slider(
+                label=label_mapping[var],
+                min_value=float(df[var].min()),
+                max_value=float(df[var].max()),
+                value=float(df[var].mean())
+            )
+            sliders.append(var_slider)
+
+    with col_result:
+        input_array = np.array(sliders)
+        input_standardized = (input_array - mean.drop('t')) / std.drop('t')
+        estimasi = rf_model.predict([input_standardized])
+        konversi = estimasi[0] * (1 / 262.97) * (2629744)  # mm/bulan -> liter/bulan/hektar
+
+        st.markdown(
+            f"""
+            <div style='
+                background-color: #f0f2f6;
+                padding: 25px;
+                border-radius: 12px;
+                border-left: 6px solid #1a73e8;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            '>
+                <h4 style='margin:0; color:#1a73e8; font-weight:600;'>Estimasi Volume Air Irigasi:</h4>
+                <p style='font-size:32px; font-weight:bold; color:#1a73e8; margin:10px 0 5px 0;'>
+                    {estimasi[0]:.3f} mm/bulan
+                </p>
+                <hr style='border-top: 1px dashed #ccc; margin:15px 0;'>
+                <p style='margin:0; color: #555; font-size:16px;'>Setara dengan:</p>
+                <p style='font-size:24px; font-weight:600; color:#444; margin:5px 0 0 0;'>
+                    {konversi:.3f} liter/bulan/hektar
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
         )
-        sliders.append(var_slider)
+        st.info("Catatan: Konversi dilakukan dari mm/bulan ke liter/bulan/hektar.")
 
-    # Prediksi
-    input_array = np.array(sliders)
-    # Standarisasi input
-    input_standardized = (input_array - mean.drop('t')) / std.drop('t')
-    estimasi = rf_model.predict([input_standardized])
-    konversi = estimasi[0] * (1 / 262.97) * (2629744) # mm/bulan -> liter/bulan/hektar
-    
-    # Tampilan hasil prediksi
-    st.markdown(
-        f"""
-        <div style='
-            background-color: #f0f2f6;
-            padding: 25px;
-            border-radius: 12px;
-            border-left: 6px solid #1a73e8;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        '>
-            <h4 style='margin:0; color:#1a73e8; font-weight:600;'>Estimasi Volume Air Irigasi:</h4>
-            <p style='font-size:32px; font-weight:bold; color:#1a73e8; margin:10px 0 5px 0;'>
-                {estimasi[0]:.3f} mm/bulan
-            </p>
-            <hr style='border-top: 1px dashed #ccc; margin:15px 0;'>
-            <p style='margin:0; color: #555; font-size:16px;'>Setara dengan:</p>
-            <p style='font-size:24px; font-weight:600; color:#444; margin:5px 0 0 0;'>
-                {konversi:.3f} liter/bulan/hektar
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.info("Catatan: Konversi dilakukan dari mm/bulan ke liter/bulan/hektar.")
 
 
 # --- Konten Tab 5: Tampilan Data ---
