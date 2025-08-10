@@ -10,3 +10,4 @@ catboost
 graphviz
 pydot
 streamlit-mermaid
+geopandas
